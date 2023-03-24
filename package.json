@@ -1,5 +1,5 @@
 {
-  "name": "node-irsdk-2023",
+  "name": "track-titan-node-irsdk-2023",
   "version": "0.0.2",
   "description": "iRacing SDK implementation for nodejs",
   "main": "src/node-irsdk.js",
@@ -16,5 +16,8 @@
   "dependencies": {
     "js-yaml": "^4.1.0",
     "nan": "^2.17.0"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/@titan-academy"
   }
 }

@@ -16,7 +16,6 @@ jobs:
         uses: borales/actions-yarn@v4
         with:
           cmd: install # will run `yarn install` command
- 
 
   publish-gpr:
     needs: build
@@ -36,5 +35,4 @@ jobs:
           cmd: install # will run `yarn install` command
       - run: npm publish
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
