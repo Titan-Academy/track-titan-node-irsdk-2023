@@ -1,7 +1,7 @@
-var util = require('util')
-var events = require('events')
-var Consts = require('./IrSdkConsts')
-var BroadcastMsg = Consts.BroadcastMsg
+var util = require("util");
+var events = require("events");
+var Consts = require("./IrSdkConsts");
+var BroadcastMsg = Consts.BroadcastMsg;
 
 /** Default parser used for SessionInfo YAML
   Fixes TeamName issue, uses js-yaml for actual parsing
@@ -9,21 +9,28 @@ var BroadcastMsg = Consts.BroadcastMsg
   @param {string} sessionInfoStr raw session info YAML string
   @returns {Object} parsed session info or falsy
 */
-function createSessionInfoParser () {
-  var yaml = require('js-yaml')
+function createSessionInfoParser() {
+  var yaml = require("js-yaml");
 
   return function (sessionInfoStr) {
-    var fixedYamlStr = sessionInfoStr.replace(/TeamName: ([^\n]+)/g, function (match, p1) {
-      if ((p1[0] === '"' && p1[p1.length - 1] === '"') ||
-          (p1[0] === "'" && p1[p1.length - 1] === "'")) {
-        return match // skip if quoted already
-      } else {
-        // 2nd replace is unnecessary atm but its here just in case
-        return "TeamName: '" + p1.replace(/'/g, "''") + "'"
+    var fixedYamlStr = sessionInfoStr.replace(
+      /TeamName: ([^\n]+)/g,
+      function (match, p1) {
+        if (
+          (p1[0] === '"' && p1[p1.length - 1] === '"') ||
+          (p1[0] === "'" && p1[p1.length - 1] === "'")
+        ) {
+          return match; // skip if quoted already
+        } else {
+          // 2nd replace is unnecessary atm but its here just in case
+          return "TeamName: '" + p1.replace(/'/g, "''") + "'";
+        }
       }
-    })
-    return yaml.load(fixedYamlStr)
-  }
+    );
+
+    fixedYamlStr = fixedYamlStr.replace(/[\u0080-\u009F]/g, "");
+    return yaml.load(fixedYamlStr);
+  };
 }
 
 /**
@@ -43,8 +50,8 @@ function createSessionInfoParser () {
 
   @example var iracing = require('node-irsdk').getInstance()
 */
-function JsIrSdk (IrSdkWrapper, opts) {
-  events.EventEmitter.call(this)
+function JsIrSdk(IrSdkWrapper, opts) {
+  events.EventEmitter.call(this);
 
   /** Execute any of available commands, excl. FFB command
     @method
@@ -53,13 +60,13 @@ function JsIrSdk (IrSdkWrapper, opts) {
     @param {Integer} [arg2] 2nd argument
     @param {Integer} [arg3] 3rd argument
   */
-  this.execCmd = IrSdkWrapper.sendCmd
+  this.execCmd = IrSdkWrapper.sendCmd;
 
   /** iRacing SDK related constants
     @type IrSdkConsts
     @instance
   */
-  this.Consts = Consts
+  this.Consts = Consts;
 
   /** Camera controls
     @type {Object}
@@ -75,7 +82,7 @@ function JsIrSdk (IrSdkWrapper, opts) {
       * iracing.camControls.setState(state)
     */
     setState: function (state) {
-      self.execCmd(BroadcastMsg.CamSetState, state)
+      self.execCmd(BroadcastMsg.CamSetState, state);
     },
     /** Switch camera, focus on car
       @method
@@ -97,18 +104,18 @@ function JsIrSdk (IrSdkWrapper, opts) {
       * iracing.camControls.switchToCar(2, 3)
     */
     switchToCar: function (carNum, camGroupNum, camNum) {
-      camGroupNum = camGroupNum | 0
-      camNum = camNum | 0
+      camGroupNum = camGroupNum | 0;
+      camNum = camNum | 0;
 
-      if (typeof carNum === 'string') {
+      if (typeof carNum === "string") {
         if (isNaN(parseInt(carNum))) {
-          carNum = stringToEnum(carNum, Consts.CamFocusAt)
+          carNum = stringToEnum(carNum, Consts.CamFocusAt);
         } else {
-          carNum = padCarNum(carNum)
+          carNum = padCarNum(carNum);
         }
       }
       if (Number.isInteger(carNum)) {
-        self.execCmd(BroadcastMsg.CamSwitchNum, carNum, camGroupNum, camNum)
+        self.execCmd(BroadcastMsg.CamSwitchNum, carNum, camGroupNum, camNum);
       }
     },
     /** Switch camera, focus on position
@@ -120,17 +127,17 @@ function JsIrSdk (IrSdkWrapper, opts) {
       @example iracing.camControls.switchToPos(2) // show P2
     */
     switchToPos: function (position, camGroupNum, camNum) {
-      camGroupNum = camGroupNum | 0
-      camNum = camNum | 0
+      camGroupNum = camGroupNum | 0;
+      camNum = camNum | 0;
 
-      if (typeof position === 'string') {
-        position = stringToEnum(position, Consts.CamFocusAt)
+      if (typeof position === "string") {
+        position = stringToEnum(position, Consts.CamFocusAt);
       }
       if (Number.isInteger(position)) {
-        self.execCmd(BroadcastMsg.CamSwitchPos, position, camGroupNum, camNum)
+        self.execCmd(BroadcastMsg.CamSwitchPos, position, camGroupNum, camNum);
       }
-    }
-  }
+    },
+  };
 
   /** Replay and playback controls
     @type {Object}
@@ -141,14 +148,14 @@ function JsIrSdk (IrSdkWrapper, opts) {
       @example iracing.playbackControls.play()
     */
     play: function () {
-      self.execCmd(BroadcastMsg.ReplaySetPlaySpeed, 1, 0)
+      self.execCmd(BroadcastMsg.ReplaySetPlaySpeed, 1, 0);
     },
     /** Pause replay
       @method
       @example iracing.playbackControls.pause()
     */
     pause: function () {
-      self.execCmd(BroadcastMsg.ReplaySetPlaySpeed, 0, 0)
+      self.execCmd(BroadcastMsg.ReplaySetPlaySpeed, 0, 0);
     },
     /** fast-forward replay
       @method
@@ -156,8 +163,8 @@ function JsIrSdk (IrSdkWrapper, opts) {
       @example iracing.playbackControls.fastForward() // double speed FF
     */
     fastForward: function (speed) {
-      speed = speed || 2
-      self.execCmd(BroadcastMsg.ReplaySetPlaySpeed, speed, 0)
+      speed = speed || 2;
+      self.execCmd(BroadcastMsg.ReplaySetPlaySpeed, speed, 0);
     },
     /** rewind replay
       @method
@@ -165,8 +172,8 @@ function JsIrSdk (IrSdkWrapper, opts) {
       @example iracing.playbackControls.rewind() // double speed RW
     */
     rewind: function (speed) {
-      speed = speed || 2
-      self.execCmd(BroadcastMsg.ReplaySetPlaySpeed, -1 * speed, 0)
+      speed = speed || 2;
+      self.execCmd(BroadcastMsg.ReplaySetPlaySpeed, -1 * speed, 0);
     },
     /** slow-forward replay, slow motion
       @method
@@ -174,9 +181,9 @@ function JsIrSdk (IrSdkWrapper, opts) {
       @example iracing.playbackControls.slowForward(2) // half speed
     */
     slowForward: function (divider) {
-      divider = divider || 2
-      divider -= 1
-      self.execCmd(BroadcastMsg.ReplaySetPlaySpeed, divider, 1)
+      divider = divider || 2;
+      divider -= 1;
+      self.execCmd(BroadcastMsg.ReplaySetPlaySpeed, divider, 1);
     },
     /** slow-backward replay, reverse slow motion
       @method
@@ -184,9 +191,9 @@ function JsIrSdk (IrSdkWrapper, opts) {
       @example iracing.playbackControls.slowBackward(2) // half speed RW
     */
     slowBackward: function (divider) {
-      divider = divider || 2
-      divider -= 1
-      self.execCmd(BroadcastMsg.ReplaySetPlaySpeed, -1 * divider, 1)
+      divider = divider || 2;
+      divider -= 1;
+      self.execCmd(BroadcastMsg.ReplaySetPlaySpeed, -1 * divider, 1);
     },
     /** Search things from replay
       @method
@@ -194,11 +201,11 @@ function JsIrSdk (IrSdkWrapper, opts) {
       @example iracing.playbackControls.search('nextIncident')
     */
     search: function (searchMode) {
-      if (typeof searchMode === 'string') {
-        searchMode = stringToEnum(searchMode, Consts.RpySrchMode)
+      if (typeof searchMode === "string") {
+        searchMode = stringToEnum(searchMode, Consts.RpySrchMode);
       }
       if (Number.isInteger(searchMode)) {
-        self.execCmd(BroadcastMsg.ReplaySearch, searchMode)
+        self.execCmd(BroadcastMsg.ReplaySearch, searchMode);
       }
     },
     /** Search timestamp
@@ -210,7 +217,11 @@ function JsIrSdk (IrSdkWrapper, opts) {
       * iracing.playbackControls.searchTs(2, 2*60*1000)
     */
     searchTs: function (sessionNum, sessionTimeMS) {
-      self.execCmd(BroadcastMsg.ReplaySearchSessionTime, sessionNum, sessionTimeMS)
+      self.execCmd(
+        BroadcastMsg.ReplaySearchSessionTime,
+        sessionNum,
+        sessionTimeMS
+      );
     },
     /** Go to frame. Frame counting can be relative to begin, end or current.
       @method
@@ -219,22 +230,22 @@ function JsIrSdk (IrSdkWrapper, opts) {
       @example iracing.playbackControls.searchFrame(1, 'current') // go to 1 frame forward
     */
     searchFrame: function (frameNum, rpyPosMode) {
-      if (typeof rpyPosMode === 'string') {
-        rpyPosMode = stringToEnum(rpyPosMode, Consts.RpyPosMode)
+      if (typeof rpyPosMode === "string") {
+        rpyPosMode = stringToEnum(rpyPosMode, Consts.RpyPosMode);
       }
       if (Number.isInteger(rpyPosMode)) {
-        self.execCmd(BroadcastMsg.ReplaySetPlayPosition, rpyPosMode, frameNum)
+        self.execCmd(BroadcastMsg.ReplaySetPlayPosition, rpyPosMode, frameNum);
       }
-    }
-  }
+    },
+  };
 
   /** Reload all car textures
     @method
     @example iracing.reloadTextures() // reload all paints
   */
   this.reloadTextures = function () {
-    this.execCmd(BroadcastMsg.ReloadTextures, Consts.ReloadTexturesMode.All)
-  }
+    this.execCmd(BroadcastMsg.ReloadTextures, Consts.ReloadTexturesMode.All);
+  };
 
   /** Reload car's texture
     @method
@@ -242,8 +253,12 @@ function JsIrSdk (IrSdkWrapper, opts) {
     @example iracing.reloadTexture(1) // reload paint of carIdx=1
   */
   this.reloadTexture = function (carIdx) {
-    this.execCmd(BroadcastMsg.ReloadTextures, Consts.ReloadTexturesMode.CarIdx, carIdx)
-  }
+    this.execCmd(
+      BroadcastMsg.ReloadTextures,
+      Consts.ReloadTexturesMode.CarIdx,
+      carIdx
+    );
+  };
 
   /** Execute chat command
     @param {IrSdkConsts.ChatCommand} cmd
@@ -251,22 +266,22 @@ function JsIrSdk (IrSdkWrapper, opts) {
     @example iracing.execChatCmd('cancel') // close chat window
   */
   this.execChatCmd = function (cmd, arg) {
-    arg = arg || 0
-    if (typeof cmd === 'string') {
-      cmd = stringToEnum(cmd, Consts.ChatCommand)
+    arg = arg || 0;
+    if (typeof cmd === "string") {
+      cmd = stringToEnum(cmd, Consts.ChatCommand);
     }
     if (Number.isInteger(cmd)) {
-      this.execCmd(BroadcastMsg.ChatComand, cmd, arg)
+      this.execCmd(BroadcastMsg.ChatComand, cmd, arg);
     }
-  }
+  };
 
   /** Execute chat macro
     @param {Integer} num Macro's number (0-15)
     @example iracing.execChatMacro(1) // macro 1
   */
   this.execChatMacro = function (num) {
-    this.execChatCmd('macro', num)
-  }
+    this.execChatCmd("macro", num);
+  };
 
   /** Execute pit command
     @param {IrSdkConsts.PitCommand} cmd
@@ -279,30 +294,30 @@ function JsIrSdk (IrSdkWrapper, opts) {
     * iracing.execPitCmd('lr', 200) // new left rear, 200 kPa
   */
   this.execPitCmd = function (cmd, arg) {
-    arg = arg || 0
-    if (typeof cmd === 'string') {
-      cmd = stringToEnum(cmd, Consts.PitCommand)
+    arg = arg || 0;
+    if (typeof cmd === "string") {
+      cmd = stringToEnum(cmd, Consts.PitCommand);
     }
     if (Number.isInteger(cmd)) {
-      this.execCmd(BroadcastMsg.PitCommand, cmd, arg)
+      this.execCmd(BroadcastMsg.PitCommand, cmd, arg);
     }
-  }
+  };
 
   /** Control telemetry logging (ibt file)
     @param {IrSdkConsts.TelemCommand} cmd Command: start/stop/restart
     @example iracing.execTelemetryCmd('restart')
   */
   this.execTelemetryCmd = function (cmd) {
-    if (typeof cmd === 'string') {
-      cmd = stringToEnum(cmd, Consts.TelemCommand)
+    if (typeof cmd === "string") {
+      cmd = stringToEnum(cmd, Consts.TelemCommand);
     }
     if (Number.isInteger(cmd)) {
-      this.execCmd(BroadcastMsg.TelemCommand, cmd)
+      this.execCmd(BroadcastMsg.TelemCommand, cmd);
     }
-  }
+  };
 
-  var self = this
-  opts = opts || {}
+  var self = this;
+  opts = opts || {};
 
   /**
    Parser for SessionInfo YAML
@@ -310,38 +325,38 @@ function JsIrSdk (IrSdkWrapper, opts) {
    @param {String} sessionInfo SessionInfo YAML
    @returns {Object} parsed session info
   */
-  var parseSessionInfo = opts.sessionInfoParser
-  if (!parseSessionInfo) parseSessionInfo = createSessionInfoParser()
+  var parseSessionInfo = opts.sessionInfoParser;
+  if (!parseSessionInfo) parseSessionInfo = createSessionInfoParser();
 
-  var connected = false // if irsdk is available
+  var connected = false; // if irsdk is available
 
   var startIntervalId = setInterval(function () {
     if (!IrSdkWrapper.isInitialized()) {
-      IrSdkWrapper.start()
+      IrSdkWrapper.start();
     }
-  }, 10000)
+  }, 10000);
 
-  IrSdkWrapper.start()
-
-  /** Latest telemetry, may be null or undefined
-
-  */
-  this.telemetry = null
+  IrSdkWrapper.start();
 
   /** Latest telemetry, may be null or undefined
 
   */
-  this.telemetryDescription = null
+  this.telemetry = null;
 
   /** Latest telemetry, may be null or undefined
 
   */
-  this.sessionInfo = null
+  this.telemetryDescription = null;
+
+  /** Latest telemetry, may be null or undefined
+
+  */
+  this.sessionInfo = null;
 
   var checkConnection = function () {
     if (IrSdkWrapper.isInitialized() && IrSdkWrapper.isConnected()) {
       if (!connected) {
-        connected = true
+        connected = true;
         /**
           iRacing, sim, is started
           @event iracing#Connected
@@ -350,11 +365,11 @@ function JsIrSdk (IrSdkWrapper, opts) {
           *   console.log(evt)
           * })
         */
-        self.emit('update', {type: 'Connected', timestamp: new Date()})
+        self.emit("update", { type: "Connected", timestamp: new Date() });
       }
     } else {
       if (connected) {
-        connected = false
+        connected = false;
         /**
           iRacing, sim, was closed
           @event iracing#Disconnected
@@ -363,25 +378,25 @@ function JsIrSdk (IrSdkWrapper, opts) {
           *   console.log(evt)
           * })
         */
-        self.emit('update', {type: 'Disconnected', timestamp: new Date()})
+        self.emit("update", { type: "Disconnected", timestamp: new Date() });
 
-        IrSdkWrapper.shutdown()
-        self.telemetryDescription = null
+        IrSdkWrapper.shutdown();
+        self.telemetryDescription = null;
       }
     }
-  }
+  };
 
   var telemetryIntervalId = setInterval(function () {
-    checkConnection()
+    checkConnection();
     if (connected && IrSdkWrapper.updateTelemetry()) {
-      var now = new Date() // date gives ms accuracy
-      self.telemetry = IrSdkWrapper.getTelemetry()
+      var now = new Date(); // date gives ms accuracy
+      self.telemetry = IrSdkWrapper.getTelemetry();
       // replace ctime timestamp
-      self.telemetry.timestamp = now
+      self.telemetry.timestamp = now;
 
       setImmediate(function () {
         if (!self.telemetryDescription) {
-          self.telemetryDescription = IrSdkWrapper.getTelemetryDescription()
+          self.telemetryDescription = IrSdkWrapper.getTelemetryDescription();
           /**
             Telemetry description, contains description of available telemetry values
             @event iracing#TelemetryDescription
@@ -391,7 +406,11 @@ function JsIrSdk (IrSdkWrapper, opts) {
             *   console.log(evt)
             * })
           */
-          self.emit('update', {type: 'TelemetryDescription', data: self.telemetryDescription, timestamp: now})
+          self.emit("update", {
+            type: "TelemetryDescription",
+            data: self.telemetryDescription,
+            timestamp: now,
+          });
         }
         /**
           Telemetry update
@@ -402,27 +421,31 @@ function JsIrSdk (IrSdkWrapper, opts) {
           *   console.log(evt)
           * })
         */
-        self.emit('update', {type: 'Telemetry', data: self.telemetry.values, timestamp: now})
-      })
+        self.emit("update", {
+          type: "Telemetry",
+          data: self.telemetry.values,
+          timestamp: now,
+        });
+      });
     }
-  }, opts.telemetryUpdateInterval)
+  }, opts.telemetryUpdateInterval);
 
   var sessionInfoIntervalId = setInterval(function () {
-    checkConnection()
+    checkConnection();
     if (connected && IrSdkWrapper.updateSessionInfo()) {
-      var now = new Date()
-      var sessionInfo = IrSdkWrapper.getSessionInfo()
-      var doc
+      var now = new Date();
+      var sessionInfo = IrSdkWrapper.getSessionInfo();
+      var doc;
       setImmediate(function () {
         try {
-          doc = parseSessionInfo(sessionInfo)
+          doc = parseSessionInfo(sessionInfo);
         } catch (ex) {
           // TODO: log faulty yaml
-          console.error('js-irsdk: yaml error: \n' + ex)
+          console.error("js-irsdk: yaml error: \n" + ex);
         }
 
         if (doc) {
-          self.sessionInfo = { timestamp: now, data: doc }
+          self.sessionInfo = { timestamp: now, data: doc };
           /**
             SessionInfo update
             @event iracing#SessionInfo
@@ -432,11 +455,15 @@ function JsIrSdk (IrSdkWrapper, opts) {
             *   console.log(evt)
             * })
           */
-          self.emit('update', {type: 'SessionInfo', data: self.sessionInfo.data, timestamp: now})
+          self.emit("update", {
+            type: "SessionInfo",
+            data: self.sessionInfo.data,
+            timestamp: now,
+          });
         }
-      })
+      });
     }
-  }, opts.sessionInfoUpdateInterval)
+  }, opts.sessionInfoUpdateInterval);
 
   /**
     any update event
@@ -447,32 +474,32 @@ function JsIrSdk (IrSdkWrapper, opts) {
     *   console.log(evt)
     * })
     */
-  self.on('update', evt => {
+  self.on("update", (evt) => {
     // fire old events as well.
-    const timestamp = evt.timestamp
-    const data = evt.data
-    const type = evt.type
+    const timestamp = evt.timestamp;
+    const data = evt.data;
+    const type = evt.type;
 
     switch (type) {
-      case 'SessionInfo':
-        self.emit('SessionInfo', {timestamp, data})
-        break
-      case 'Telemetry':
-        self.emit('Telemetry', {timestamp, values: data})
-        break
-      case 'TelemetryDescription':
-        self.emit('TelemetryDescription', data)
-        break
-      case 'Connected':
-        self.emit('Connected')
-        break
-      case 'Disconnected':
-        self.emit('Disconnected')
-        break
+      case "SessionInfo":
+        self.emit("SessionInfo", { timestamp, data });
+        break;
+      case "Telemetry":
+        self.emit("Telemetry", { timestamp, values: data });
+        break;
+      case "TelemetryDescription":
+        self.emit("TelemetryDescription", data);
+        break;
+      case "Connected":
+        self.emit("Connected");
+        break;
+      case "Disconnected":
+        self.emit("Disconnected");
+        break;
       default:
-        break
+        break;
     }
-  })
+  });
 
   /**
     Stops JsIrSdk, no new events are fired after calling this
@@ -480,40 +507,40 @@ function JsIrSdk (IrSdkWrapper, opts) {
     @private
   */
   this._stop = function () {
-    clearInterval(telemetryIntervalId)
-    clearInterval(sessionInfoIntervalId)
-    clearInterval(startIntervalId)
-    IrSdkWrapper.shutdown()
-  }
+    clearInterval(telemetryIntervalId);
+    clearInterval(sessionInfoIntervalId);
+    clearInterval(startIntervalId);
+    IrSdkWrapper.shutdown();
+  };
 
   /** pad car number
     @function
     @private
   */
-  function padCarNum (numStr) {
-    if (typeof numStr === 'string') {
-      var num = parseInt(numStr)
-      var zeros = numStr.length - num.toString().length
-      if (!zeros) return num
+  function padCarNum(numStr) {
+    if (typeof numStr === "string") {
+      var num = parseInt(numStr);
+      var zeros = numStr.length - num.toString().length;
+      if (!zeros) return num;
 
-      var numPlaces = 1
-      if (num > 9) numPlaces = 2
-      if (num > 99) numPlaces = 3
+      var numPlaces = 1;
+      if (num > 9) numPlaces = 2;
+      if (num > 99) numPlaces = 3;
 
-      return (numPlaces + zeros) * 1000 + num
+      return (numPlaces + zeros) * 1000 + num;
     }
   }
 }
 
-util.inherits(JsIrSdk, events.EventEmitter)
+util.inherits(JsIrSdk, events.EventEmitter);
 
-module.exports = JsIrSdk
+module.exports = JsIrSdk;
 
-function stringToEnum (input, enumObj) {
+function stringToEnum(input, enumObj) {
   var enumKey = Object.keys(enumObj).find(function (key) {
-    return key.toLowerCase() === input.toLowerCase()
-  })
+    return key.toLowerCase() === input.toLowerCase();
+  });
   if (enumKey) {
-    return enumObj[enumKey]
+    return enumObj[enumKey];
   }
 }
