@@ -28,8 +28,11 @@ function createSessionInfoParser() {
       }
     );
 
-    fixedYamlStr = fixedYamlStr.replace(/[\u0080-\u009F]/g, "");
-    return yaml.load(fixedYamlStr);
+    const sanitizedSessionInfo = fixedYamlStr.replace(
+      /[\x00-\x08\x0B\x0C\x0E-\x1F\x7F\x80-\x9F]/g,
+      ""
+    );
+    return yaml.load(sanitizedSessionInfo);
   };
 }
 
