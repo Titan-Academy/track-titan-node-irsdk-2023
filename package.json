@@ -8,7 +8,7 @@
     "module_path": "./lib/binding/napi-v{napi_build_version}",
     "remote_path": "./{module_name}/v{version}/{configuration}/",
     "package_name": "{platform}-{arch}-napi-v{napi_build_version}.tar.gz",
-    "host": "https://your_bucket.s3-us-west-1.amazonaws.com",
+    "host": "https://iracing-node-binaries.s3-us-east-1.amazonaws.com",
     "napi_versions": [
       8,
       9

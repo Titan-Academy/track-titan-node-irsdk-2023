@@ -8,28 +8,26 @@
 #include <map>
 #include <string>
 #include <vector>
-#include <napi.h>
 
 namespace NodeIrSdk
 {
 
-  class IRSDKWrapper : public Napi::ObjectWrap<IRSDKWrapper>
+  class IRSDKWrapper
   {
   public:
-    static Napi::Object Init(Napi::Env env, Napi::Object exports);
-    IRSDKWrapper(const Napi::CallbackInfo &info);
+    IRSDKWrapper();
     ~IRSDKWrapper();
 
-    Napi::Value Startup(const Napi::CallbackInfo &info);
-    void Shutdown(const Napi::CallbackInfo &info);
+    bool startup();
+    void shutdown();
 
-    Napi::Value IsInitialized(const Napi::CallbackInfo &info);
-    Napi::Value IsConnected(const Napi::CallbackInfo &info);
+    bool isInitialized() const;
+    bool isConnected() const;
 
-    Napi::Value UpdateTelemetry(const Napi::CallbackInfo &info);   // returns true if telemetry update available
-    Napi::Value UpdateSessionInfo(const Napi::CallbackInfo &info); // returns true if session info update available
+    bool updateTelemetry();   // returns true if telemetry update available
+    bool updateSessionInfo(); // returns true if session info update available
 
-    Napi::Value GetSessionInfo(const Napi::CallbackInfo &info); // returns yaml string
+    const std::string getSessionInfo() const; // returns yaml string
 
     struct TelemetryVar
     {
@@ -49,11 +47,11 @@ namespace NodeIrSdk
       ~TelemetryVar();
     };
 
-    Napi::Value GetVarHeaders(const Napi::CallbackInfo &info);
+    const std::vector<irsdk_varHeader *> getVarHeaders() const;
 
-    Napi::Value GetVarVal(const Napi::CallbackInfo &info);
+    bool getVarVal(TelemetryVar &var) const;
 
-    Napi::Value GetLastTelemetryUpdateTS(const Napi::CallbackInfo &info); // returns JS compatible TS
+    const double getLastTelemetryUpdateTS() const; // returns JS compatible TS
 
   private:
     HANDLE hMemMapFile;

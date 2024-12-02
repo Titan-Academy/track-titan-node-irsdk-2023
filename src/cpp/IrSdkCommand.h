@@ -1,9 +1,9 @@
 #pragma once
 
 #include "irsdk/irsdk_defines.h"
-#include <napi.h>
 
 namespace NodeIrSdk
 {
-  Napi::Value broadcastCmd(const Napi::CallbackInfo &info);
+  void broadcastCmd(int cmd, int var1, int var2);
+  void broadcastCmd(int cmd, int var1, int var2, int var3);
 }

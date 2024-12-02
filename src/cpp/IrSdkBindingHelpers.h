@@ -1,16 +1,18 @@
 #pragma once
 
-#include <napi.h>
+#include <node.h>
 #include "irsdk/irsdk_defines.h"
 #include "IRSDKWrapper.h"
 #include <vector>
 
+using namespace v8;
+
 namespace NodeIrSdk
 {
 
-    Napi::Value ConvertTelemetryValueToObjectDouble(const Napi::Env &env, IRSDKWrapper::TelemetryVar &var, const int &index);
-    Napi::Value ConvertTelemetryVarToObject(const Napi::Env &env, IRSDKWrapper::TelemetryVar &var);
-    void ConvertVarHeaderToObject(const Napi::Env &env, IRSDKWrapper::TelemetryVar &var, Napi::Object &obj);
+    Local<Value> convertTelemetryValueToObjectDouble(IRSDKWrapper::TelemetryVar &var, const int &index);
+    Local<Value> convertTelemetryVarToObject(IRSDKWrapper::TelemetryVar &var);
+    void convertVarHeaderToObject(IRSDKWrapper::TelemetryVar &var, Local<Object> &obj);
 
     struct MaskName
     {
@@ -20,10 +22,10 @@ namespace NodeIrSdk
         MaskName(int val, const char *name);
     };
 
-    Napi::Value GetStringValue(const Napi::Env &env, const int &val, const std::vector<MaskName> &map);
+    Local<Value> getStringValue(const int &val, const std::vector<MaskName> &map);
 
-    Napi::Value GetMaskedValues(const Napi::Env &env, const int &val, char *unit);
-    Napi::Array GetValueArr(const Napi::Env &env, const int &val, const std::vector<MaskName> MASKS);
+    Local<Value> getMaskedValues(const int &val, char *unit);
+    Local<Array> getValueArr(const int &val, const std::vector<MaskName> MASKS);
 
     const std::vector<MaskName> FLAG_MASKS = {
         MaskName((int)irsdk_checkered, "Checkered"),

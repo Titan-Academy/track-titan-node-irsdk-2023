@@ -1,4 +1,6 @@
-﻿#include "IRSDKWrapper.h"
+﻿#pragma once
+
+#include "IRSDKWrapper.h"
 #include "IrSdkBindingHelpers.h"
 #include "IrSdkNodeBindings.h"
 #include "IrSdkCommand.h"
@@ -6,137 +8,136 @@
 #include <iostream>
 #include <stdint.h>
 
+using namespace v8;
+
 namespace NodeIrSdk
 {
 
-  Napi::Value Start(const Napi::CallbackInfo &info)
+  void start(const Nan::FunctionCallbackInfo<v8::Value> &args)
   {
-    return Napi::Boolean::New(info.Env(), irsdk.Startup(info));
+    args.GetReturnValue().Set(Nan::New(irsdk.startup()));
   }
 
-  void Shutdown(const Napi::CallbackInfo &info)
+  void shutdown(const Nan::FunctionCallbackInfo<v8::Value> &args)
   {
-    irsdk.Shutdown(info);
+    irsdk.shutdown();
+    args.GetReturnValue().Set(Nan::Undefined());
   }
 
-  Napi::Value IsInitialized(const Napi::CallbackInfo &info)
+  void isInitialized(const Nan::FunctionCallbackInfo<v8::Value> &args)
   {
-    return irsdk.IsInitialized(info);
+    args.GetReturnValue().Set(Nan::New(irsdk.isInitialized()));
   }
 
-  Napi::Value IsConnected(const Napi::CallbackInfo &info)
+  void isConnected(const Nan::FunctionCallbackInfo<v8::Value> &args)
   {
-    return irsdk.IsConnected(info);
+    args.GetReturnValue().Set(Nan::New(irsdk.isConnected()));
   }
 
-  Napi::Value UpdateSessionInfo(const Napi::CallbackInfo &info)
+  void updateSessionInfo(const Nan::FunctionCallbackInfo<v8::Value> &args)
   {
-    return irsdk.UpdateSessionInfo(info);
+    args.GetReturnValue().Set(Nan::New(irsdk.updateSessionInfo()));
   }
 
-  Napi::Value GetSessionInfo(const Napi::CallbackInfo &info)
+  void getSessionInfo(const Nan::FunctionCallbackInfo<v8::Value> &args)
   {
-    return irsdk.GetSessionInfo(info);
+    args.GetReturnValue().Set(
+        Nan::Encode(irsdk.getSessionInfo().c_str(), irsdk.getSessionInfo().length(), Nan::BINARY));
   }
 
-  Napi::Value UpdateTelemetry(const Napi::CallbackInfo &info)
+  void updateTelemetry(const Nan::FunctionCallbackInfo<v8::Value> &args)
   {
-    return irsdk.UpdateTelemetry(info);
+    args.GetReturnValue().Set(Nan::New(irsdk.updateTelemetry()));
   }
 
-  Napi::Value GetTelemetry(const Napi::CallbackInfo &info)
+  void getTelemetry(const Nan::FunctionCallbackInfo<v8::Value> &args)
   {
-    Napi::Env env = info.Env();
-    Napi::Object rootObj = Napi::Object::New(env);
-    Napi::Object valuesObj = Napi::Object::New(env);
+    Local<Object> rootObj = Nan::New<v8::Object>();
+    Local<Object> valuesObj = Nan::New<v8::Object>();
+    Nan::Set(rootObj, Nan::New("timestamp").ToLocalChecked(), Nan::New<Date>(irsdk.getLastTelemetryUpdateTS()).ToLocalChecked());
 
-    rootObj.Set("timestamp", Napi::Date::New(env, irsdk.GetLastTelemetryUpdateTS(info).As<Napi::Number>().DoubleValue()));
-
-    std::vector<irsdk_varHeader *> headers = irsdk.varHeadersArr;
+    std::vector<irsdk_varHeader *> headers = irsdk.getVarHeaders();
 
     for (const auto item : headers)
     {
       IRSDKWrapper::TelemetryVar var(item);
-      irsdk.GetVarVal(Napi::CallbackInfo(env, &var, 1));
-      Napi::Value varValue = ConvertTelemetryVarToObject(env, var);
-      valuesObj.Set(item->name, varValue);
+      irsdk.getVarVal(var);
+      Local<Value> varValue = convertTelemetryVarToObject(var);
+      Nan::Set(valuesObj, Nan::New(var.header->name).ToLocalChecked(), varValue);
     }
-
-    rootObj.Set("values", valuesObj);
-    return rootObj;
+    Nan::Set(rootObj, Nan::New("values").ToLocalChecked(), valuesObj);
+    args.GetReturnValue().Set(rootObj);
   }
 
-  Napi::Value GetTelemetryDescription(const Napi::CallbackInfo &info)
+  void getTelemetryDescription(const Nan::FunctionCallbackInfo<v8::Value> &args)
   {
-    Napi::Env env = info.Env();
-    Napi::Object obj = Napi::Object::New(env);
-    std::vector<irsdk_varHeader *> headers = irsdk.varHeadersArr;
+    Local<Object> obj = Nan::New<Object>();
+    std::vector<irsdk_varHeader *> headers = irsdk.getVarHeaders();
 
     for (const auto item : headers)
     {
       IRSDKWrapper::TelemetryVar var(item);
-      irsdk.GetVarVal(Napi::CallbackInfo(env, &var, 1));
-      Napi::Object varObj = Napi::Object::New(env);
-      ConvertVarHeaderToObject(env, var, varObj);
-      obj.Set(item->name, varObj);
+      irsdk.getVarVal(var);
+      Local<Object> varObj = Nan::New<Object>();
+      convertVarHeaderToObject(var, varObj);
+      Nan::Set(obj, Nan::New(var.header->name).ToLocalChecked(), varObj);
     }
-
-    return obj;
+    args.GetReturnValue().Set(obj);
   }
 
-  Napi::Value SendCmd(const Napi::CallbackInfo &info)
+  NAN_METHOD(sendCmd)
   {
-    Napi::Env env = info.Env();
 
-    if (!irsdk.IsInitialized(info).As<Napi::Boolean>().Value() ||
-        !irsdk.IsConnected(info).As<Napi::Boolean>().Value())
-    {
-      return env.Undefined();
-    }
+    if (!irsdk.isInitialized() || !irsdk.isConnected())
+      return;
 
     if (info.Length() > 4 || info.Length() < 1)
     {
-      Napi::TypeError::New(env, "sendCommand: invalid arguments (1 to 4 accepted)").ThrowAsJavaScriptException();
-      return env.Undefined();
+      std::cerr << "sendCommand: invalid arguments (1 to 4 accepted)" << std::endl;
+      return;
     }
 
-    for (size_t i = 0; i < info.Length(); ++i)
+    for (int i = 0; i < info.Length(); ++i)
     {
-      if (!info[i].IsNumber())
+      if (!info[i]->IsInt32())
       {
-        Napi::TypeError::New(env, "sendCommand: invalid argument type, number needed").ThrowAsJavaScriptException();
-        return env.Undefined();
+        std::cerr << "sendCommand: invalid argument type, int32 needed" << std::endl;
+        return;
       }
     }
 
     switch (info.Length())
     {
     case 1:
-      broadcastCmd(info[0].As<Napi::Number>().Int32Value(), 0, 0);
+      broadcastCmd(
+          info[0]->Int32Value(Nan::GetCurrentContext()).FromJust(),
+          0,
+          0);
       break;
     case 2:
-      broadcastCmd(info[0].As<Napi::Number>().Int32Value(),
-                   info[1].As<Napi::Number>().Int32Value(), 0);
+      broadcastCmd(
+          info[0]->Int32Value(Nan::GetCurrentContext()).FromJust(),
+          info[1]->Int32Value(Nan::GetCurrentContext()).FromJust(),
+          0);
       break;
     case 3:
-      broadcastCmd(info[0].As<Napi::Number>().Int32Value(),
-                   info[1].As<Napi::Number>().Int32Value(),
-                   info[2].As<Napi::Number>().Int32Value());
+      broadcastCmd(
+          info[0]->Int32Value(Nan::GetCurrentContext()).FromJust(),
+          info[1]->Int32Value(Nan::GetCurrentContext()).FromJust(),
+          info[2]->Int32Value(Nan::GetCurrentContext()).FromJust());
       break;
     case 4:
-      broadcastCmd(info[0].As<Napi::Number>().Int32Value(),
-                   info[1].As<Napi::Number>().Int32Value(),
-                   info[2].As<Napi::Number>().Int32Value(),
-                   info[3].As<Napi::Number>().Int32Value());
+      broadcastCmd(
+          info[0]->Int32Value(Nan::GetCurrentContext()).FromJust(),
+          info[1]->Int32Value(Nan::GetCurrentContext()).FromJust(),
+          info[2]->Int32Value(Nan::GetCurrentContext()).FromJust(),
+          info[3]->Int32Value(Nan::GetCurrentContext()).FromJust());
       break;
     }
-
-    return env.Undefined();
   }
 
-  void CleanUp(void *arg)
+  static void cleanUp(void *arg)
   {
-    irsdk.Shutdown(Napi::CallbackInfo(nullptr, nullptr, 0));
+    irsdk.shutdown();
   }
-
 } // namespace NodeIrSdk
