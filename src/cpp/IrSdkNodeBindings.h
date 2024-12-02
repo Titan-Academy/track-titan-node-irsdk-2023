@@ -1,65 +1,54 @@
 #pragma once
 
-#include <node.h>
-#include <nan.h>
+#include <napi.h>
+#include "IRSDKWrapper.h"
 
-using namespace v8;
-
-
-namespace NodeIrSdk {
+namespace NodeIrSdk
+{
 
   IRSDKWrapper irsdk;
 
-  void start(const Nan::FunctionCallbackInfo<v8::Value>& args);
+  Napi::Value Start(const Napi::CallbackInfo &info);
 
-  void shutdown(const Nan::FunctionCallbackInfo<v8::Value>& args);
+  void Shutdown(const Napi::CallbackInfo &info);
 
-  void isInitialized(const Nan::FunctionCallbackInfo<v8::Value>& args);
+  Napi::Value IsInitialized(const Napi::CallbackInfo &info);
 
-  void isConnected(const Nan::FunctionCallbackInfo<v8::Value>& args);
+  Napi::Value IsConnected(const Napi::CallbackInfo &info);
 
-  void updateSessionInfo(const Nan::FunctionCallbackInfo<v8::Value>& args);
+  Napi::Value UpdateSessionInfo(const Napi::CallbackInfo &info);
 
-  void getSessionInfo(const Nan::FunctionCallbackInfo<v8::Value>& args);
+  Napi::Value GetSessionInfo(const Napi::CallbackInfo &info);
 
-  void updateTelemetry(const Nan::FunctionCallbackInfo<v8::Value>& args);
+  Napi::Value UpdateTelemetry(const Napi::CallbackInfo &info);
 
-  void getTelemetry(const Nan::FunctionCallbackInfo<v8::Value>& args);
+  Napi::Value GetTelemetry(const Napi::CallbackInfo &info);
 
-  void getTelemetryDescription(const Nan::FunctionCallbackInfo<v8::Value>& args);
-  
-  NAN_METHOD(sendCmd);
+  Napi::Value GetTelemetryDescription(const Napi::CallbackInfo &info);
 
-  static void cleanUp(void* arg);
+  Napi::Value SendCmd(const Napi::CallbackInfo &info);
 
-  // this defines public api of native addon
-  NAN_MODULE_INIT(init)
+  static void CleanUp(void *arg);
+
+  Napi::Object Init(Napi::Env env, Napi::Object exports)
   {
-    irsdk.startup();
+    irsdk.Startup(Napi::CallbackInfo(env, nullptr, 0));
 
-    node::AtExit(node::GetCurrentEnvironment(Nan::GetCurrentContext()), cleanUp, cleanUp);
+    node::AddEnvironmentCleanupHook(env, CleanUp, nullptr);
 
-    NAN_EXPORT(target, start);
-    NAN_EXPORT(target, shutdown);
+    exports.Set("start", Napi::Function::New(env, Start));
+    exports.Set("shutdown", Napi::Function::New(env, Shutdown));
+    exports.Set("isInitialized", Napi::Function::New(env, IsInitialized));
+    exports.Set("isConnected", Napi::Function::New(env, IsConnected));
+    exports.Set("updateSessionInfo", Napi::Function::New(env, UpdateSessionInfo));
+    exports.Set("getSessionInfo", Napi::Function::New(env, GetSessionInfo));
+    exports.Set("updateTelemetry", Napi::Function::New(env, UpdateTelemetry));
+    exports.Set("getTelemetryDescription", Napi::Function::New(env, GetTelemetryDescription));
+    exports.Set("getTelemetry", Napi::Function::New(env, GetTelemetry));
+    exports.Set("sendCmd", Napi::Function::New(env, SendCmd));
 
-    NAN_EXPORT(target, isInitialized);
-    NAN_EXPORT(target, isConnected);
-
-    NAN_EXPORT(target, updateSessionInfo);
-    NAN_EXPORT(target, getSessionInfo);
-
-    NAN_EXPORT(target, updateTelemetry);
-    NAN_EXPORT(target, getTelemetryDescription);
-    NAN_EXPORT(target, getTelemetry);
-    
-    NAN_EXPORT(target, sendCmd);
+    return exports;
   }
 
-  // name of native addon (fixed for electron)
-  // https://github.com/electron/electron/issues/18397
-  #if NODE_MAJOR_VERSION >= 10
-  NAN_MODULE_WORKER_ENABLED(IrSdkNodeBindings, init)
-  #else
-  NODE_MODULE(IrSdkNodeBindings, init)
-  #endif
+  NODE_API_MODULE(IrSdkNodeBindings, Init)
 }

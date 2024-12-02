@@ -1,12 +1,18 @@
-var IrSdkNodeWrapper = require('../build/Release/IrSdkNodeBindings.node')
-var JsIrSdk = require('./JsIrSdk')
+var binary = require("@mapbox/node-pre-gyp");
+var path = require("path");
+var binding_path = binary.find(
+  path.resolve(path.join(__dirname, "./package.json"))
+);
+var IrSdkNodeWrapper = require(binding_path);
+
+var JsIrSdk = require("./JsIrSdk");
 
 /**
   @module irsdk
 */
-module.exports = {}
+module.exports = {};
 
-var instance
+var instance;
 
 /**
   Initialize JsIrSdk, can be done once before using getInstance first time.
@@ -22,16 +28,21 @@ var instance
   * // look for telemetry updates only once per 100 ms
   * var iracing = irsdk.init({telemetryUpdateInterval: 100})
 */
-var init = module.exports.init = function (opts) {
+var init = (module.exports.init = function (opts) {
   if (!instance) {
-    instance = new JsIrSdk(IrSdkNodeWrapper,
-      Object.assign({
-        telemetryUpdateInterval: 0,
-        sessionInfoUpdateInterval: 0
-      }, opts))
+    instance = new JsIrSdk(
+      IrSdkNodeWrapper,
+      Object.assign(
+        {
+          telemetryUpdateInterval: 0,
+          sessionInfoUpdateInterval: 0,
+        },
+        opts
+      )
+    );
   }
-  return instance
-}
+  return instance;
+});
 
 /**
   Get initialized instance of JsIrSdk
@@ -43,5 +54,5 @@ var init = module.exports.init = function (opts) {
   * var iracing = irsdk.getInstance()
 */
 module.exports.getInstance = function () {
-  return init()
-}
+  return init();
+};

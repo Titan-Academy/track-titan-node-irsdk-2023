@@ -1,0 +1,67 @@
+name: Build and Publish Precompiled Binaries
+
+on:
+  push:
+    tags:
+      - 'v*' # Trigger workflow on version tags (e.g., v1.0.0)
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14, 16, 18, 19, 20, 21, 22, 23] # Node.js versions to build for
+        platform: [linux, darwin, win32] # Platforms to target
+        architecture: [x64, arm64] # Architectures to support
+
+    steps:
+      # Step 1: Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Node.js
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      # Step 3: Cache Node.js `node-gyp` builds
+      - name: Cache node-gyp build artifacts
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/node-gyp
+          key: ${{ runner.os }}-node-gyp-${{ matrix.node-version }}-${{ matrix.architecture }}
+          restore-keys: |
+            ${{ runner.os }}-node-gyp-${{ matrix.node-version }}-
+
+      # Step 4: Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Step 5: Build binary
+      - name: Build binary for ${{ matrix.platform }} ${{ matrix.architecture }}
+        run: npm run prebuild
+        env:
+          npm_config_arch: ${{ matrix.architecture }}
+          npm_config_platform: ${{ matrix.platform }}
+
+      # Step 6: Test the binary
+      - name: Test the binary
+        run: npm run testbinary
+        env:
+          npm_config_arch: ${{ matrix.architecture }}
+          npm_config_platform: ${{ matrix.platform }}
+
+      # Step 7: Configure AWS credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      # Step 8: Publish binary to S3
+      - name: Publish binary to S3
+        run: npm run publish
