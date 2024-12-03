@@ -3,9 +3,9 @@ name: Build and Publish Precompiled Binaries
 on:
   push:
     tags:
-      - 'v*' # Trigger workflow on version tags (e.g., v1.0.0)
+      - 'v*'
     branches:
-      - 'use-precompiled-binaries-with-node-api' # Trigger workflow on pull requests to any branch
+      - 'use-precompiled-binaries-with-node-api'
 
 jobs:
   build-and-publish:
@@ -13,16 +13,14 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18, 19, 20, 21, 22, 23] # Node.js versions to build for
-        platform: [win32] # Platforms to target
-        architecture: [x64] # Architectures to support
+        node-version: [18, 19, 20, 21, 22, 23]
+        platform: [win32]
+        architecture: [x64]
 
     steps:
-      # Step 1: Checkout the code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Set up Node.js
       - name: Set up Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
@@ -39,7 +37,6 @@ jobs:
           python -m ensurepip --upgrade
           python -m pip install setuptools --upgrade
 
-      # Step 4: Cache Node.js `node-gyp` builds
       - name: Cache node-gyp build artifacts
         uses: actions/cache@v3
         with:
@@ -48,34 +45,34 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-gyp-${{ matrix.node-version }}-
 
-      # Step 4.5: Install nan@latest for Node.js versions > 20
       - name: Install nan@latest for newer Node.js versions
         if: ${{ matrix.node-version > 20 }}
         run: npm install nan@latest
-        
-      # Step 5: Install dependencies
+
       - name: Install dependencies
         run: npm run installFromSource
 
-      # Step 6: Build binary
       - name: Build binary for ${{ matrix.platform }} ${{ matrix.architecture }}
         run: npm run prebuild
         env:
           npm_config_arch: ${{ matrix.architecture }}
           npm_config_platform: ${{ matrix.platform }}
 
-      # Step 7: Test the binary
+      - name: Package binary for ${{ matrix.platform }} ${{ matrix.architecture }}
+        run: npm run package
+        env:
+          npm_config_arch: ${{ matrix.architecture }}
+          npm_config_platform: ${{ matrix.platform }}
+
       - name: Test the binary
         run: npm run testbinary
         env:
           npm_config_arch: ${{ matrix.architecture }}
           npm_config_platform: ${{ matrix.platform }}
           
-      # Step 7.5: Create binding.gyp location file
       - name: Create binding location file
         run: node createBindingLocation.js
 
-      # Step 8: Commit binary to the repository
       - name: Commit binary to the repository
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
