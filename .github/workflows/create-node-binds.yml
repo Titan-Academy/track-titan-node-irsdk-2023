@@ -34,10 +34,6 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Install Windows build tools
-        if: matrix.platform == 'win32'
-        run: npm install --global windows-build-tools
-
       # Step 4: Cache Node.js `node-gyp` builds
       - name: Cache node-gyp build artifacts
         uses: actions/cache@v3
