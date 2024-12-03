@@ -4,8 +4,6 @@ on:
   push:
     tags:
       - 'v*'
-    branches:
-      - 'use-precompiled-binaries-with-node-api'
 
 jobs:
   build-and-publish:

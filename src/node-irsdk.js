@@ -4,14 +4,27 @@ const majorVersion = process.version.split(".")[0].replace("v", "");
 const platform = process.platform;
 const arch = process.arch;
 
+const isElectron = () => {
+  // Main process
+  if (typeof process !== 'undefined' && typeof process.versions === 'object' && !!process.versions.electron) {
+    return true;
+  }
+
+  return false;
+};
+
 const bindingName = `IrSdkNodeBindings.node`;
-const bindingPath = path.resolve(
-  path.join(
-    __dirname,
-    "../binding",
-    `${majorVersion}-${platform}-${arch}-${bindingName}`
-  )
-);
+if (isElectron()) {
+  bindingPath = path.resolve(path.join(__dirname, "../lib/binding", bindingName));
+} else {
+  bindingPath = path.resolve(
+    path.join(
+      __dirname,
+      "../binding",
+      `${majorVersion}-${platform}-${arch}-${bindingName}`
+    )
+  );
+}
 
 var IrSdkNodeWrapper;
 try {
