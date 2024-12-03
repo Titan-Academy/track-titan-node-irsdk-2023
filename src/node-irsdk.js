@@ -1,9 +1,13 @@
-// var binary = require("@mapbox/node-pre-gyp");
-// var path = require("path");
-// var binding_path = binary.find(
-//   path.resolve(path.join(__dirname, "../package.json"))
-// );
-var IrSdkNodeWrapper = require('../lib/binding/napi-v9/IrSdkNodeBindings.node');
+var path = require("path");
+
+const majorVersion = process.version.split('.')[0].replace('v', '');
+const platform = process.platform;
+const arch = process.arch;
+
+const bindingName = `IrSdkNodeBindings.node`;
+const bindingPath = path.resolve(path.join(__dirname, '../binding', `${majorVersion}-${platform}-${arch}-${bindingName}`))
+
+var IrSdkNodeWrapper = require(bindingPath);
 
 var JsIrSdk = require("./JsIrSdk");
 

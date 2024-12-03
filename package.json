@@ -5,20 +5,22 @@
   "main": "src/node-irsdk.js",
   "binary": {
     "module_name": "IrSdkNodeBindings",
-    "module_path": "./lib/binding/{node_napi_label}",
+    "module_path": "./lib/binding/",
     "remote_path": "./{module_name}/v{version}/{configuration}/",
-    "package_name": "{platform}-{arch}-napi-v{napi_build_version}.tar.gz",
-    "host": "https://iracing-node-binaries.s3-us-east-1.amazonaws.com",
-    "napi_versions": [
-      9
-    ]
+    "package_name": "{platform}-{arch}-v{version}.tar.gz",
+    "host": "https://iracing-node-binaries.s3-us-east-1.amazonaws.com"
   },
   "scripts": {
     "installFromSource": "npm install --build-from-source",
     "install": "node-pre-gyp install",
+    "postinstall": "node createBindingLocation.js",
     "prebuild": "node-pre-gyp configure build",
     "rebuild": "node-pre-gyp rebuild --verbose",
+    "postrebuild": "node createBindingLocation.js",
+
     "publish": "node-pre-gyp package publish",
+    "postpackage": "node createBindingLocation.js",
+
     "package": "node-pre-gyp package",
     "testbinary": "node-pre-gyp testpackage runtime=node"
   },
