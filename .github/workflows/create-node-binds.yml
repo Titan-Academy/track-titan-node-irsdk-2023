@@ -45,7 +45,7 @@ jobs:
 
       # Step 5: Install dependencies
       - name: Install dependencies
-        run: npm install
+        run: npm run installFromSource
 
       # Step 6: Build binary
       - name: Build binary for ${{ matrix.platform }} ${{ matrix.architecture }}
@@ -60,6 +60,10 @@ jobs:
         env:
           npm_config_arch: ${{ matrix.architecture }}
           npm_config_platform: ${{ matrix.platform }}
+          
+      # Step 7.5: Create binding.gyp location file
+      - name: Create binding location file
+        run: node createBindingLocation.js
 
       # Step 8: Commit binary to the repository
       - name: Commit binary to the repository
