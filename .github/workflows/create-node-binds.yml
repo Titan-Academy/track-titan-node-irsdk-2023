@@ -39,10 +39,6 @@ jobs:
           python -m ensurepip --upgrade
           python -m pip install setuptools --upgrade
 
-      # Configure npm to use the correct Python path
-      - name: Configure npm to use Python
-        run: npm config set python "$(which python)"
-
       # Step 4: Cache Node.js `node-gyp` builds
       - name: Cache node-gyp build artifacts
         uses: actions/cache@v3
