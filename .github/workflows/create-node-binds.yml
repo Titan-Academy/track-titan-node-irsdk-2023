@@ -15,7 +15,7 @@ jobs:
       matrix:
         node-version: [18, 19, 20, 21, 22, 23] # Node.js versions to build for
         platform: [win32] # Platforms to target
-        architecture: [x64, arm64] # Architectures to support
+        architecture: [x64] # Architectures to support
 
     steps:
       # Step 1: Checkout the code
