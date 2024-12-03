@@ -1,13 +1,29 @@
 var path = require("path");
 
-const majorVersion = process.version.split('.')[0].replace('v', '');
+const majorVersion = process.version.split(".")[0].replace("v", "");
 const platform = process.platform;
 const arch = process.arch;
 
 const bindingName = `IrSdkNodeBindings.node`;
-const bindingPath = path.resolve(path.join(__dirname, '../binding', `${majorVersion}-${platform}-${arch}-${bindingName}`))
+const bindingPath = path.resolve(
+  path.join(
+    __dirname,
+    "../binding",
+    `${majorVersion}-${platform}-${arch}-${bindingName}`
+  )
+);
 
-var IrSdkNodeWrapper = require(bindingPath);
+var IrSdkNodeWrapper;
+try {
+  IrSdkNodeWrapper = require(bindingPath);
+} catch (err) {
+  console.error(
+    "Failed to load iRacing SDK bindings.",
+    `${majorVersion}-${platform}-${arch} not supported.`,
+    err.message
+  );
+  throw err;
+}
 
 var JsIrSdk = require("./JsIrSdk");
 
