@@ -48,6 +48,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-gyp-${{ matrix.node-version }}-
 
+      # Step 4.5: Install nan@latest for Node.js versions > 20
+      - name: Install nan@latest for newer Node.js versions
+        if: ${{ matrix.node-version > 20 }}
+        run: npm install nan@latest
+        
       # Step 5: Install dependencies
       - name: Install dependencies
         run: npm run installFromSource
