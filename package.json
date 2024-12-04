@@ -11,8 +11,8 @@
     "host": "https://iracing-node-binaries.s3-us-east-1.amazonaws.com"
   },
   "scripts": {
-    "installFromSource": "npm install --build-from-source",
-    "install": "node-pre-gyp install",
+    "installFromSource": "npm install",
+    "install": "node-pre-gyp install --build-from-source",
     "postinstall": "node createBindingLocation.js",
     "prebuild": "node-pre-gyp configure build",
     "rebuild": "node-pre-gyp rebuild --verbose",
