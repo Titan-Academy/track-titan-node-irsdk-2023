@@ -5,32 +5,32 @@
 
 using namespace v8;
 
-
-namespace NodeIrSdk {
+namespace NodeIrSdk
+{
 
   IRSDKWrapper irsdk;
 
-  void start(const Nan::FunctionCallbackInfo<v8::Value>& args);
+  void start(const Nan::FunctionCallbackInfo<v8::Value> &args);
 
-  void shutdown(const Nan::FunctionCallbackInfo<v8::Value>& args);
+  void shutdown(const Nan::FunctionCallbackInfo<v8::Value> &args);
 
-  void isInitialized(const Nan::FunctionCallbackInfo<v8::Value>& args);
+  void isInitialized(const Nan::FunctionCallbackInfo<v8::Value> &args);
 
-  void isConnected(const Nan::FunctionCallbackInfo<v8::Value>& args);
+  void isConnected(const Nan::FunctionCallbackInfo<v8::Value> &args);
 
-  void updateSessionInfo(const Nan::FunctionCallbackInfo<v8::Value>& args);
+  void updateSessionInfo(const Nan::FunctionCallbackInfo<v8::Value> &args);
 
-  void getSessionInfo(const Nan::FunctionCallbackInfo<v8::Value>& args);
+  void getSessionInfo(const Nan::FunctionCallbackInfo<v8::Value> &args);
 
-  void updateTelemetry(const Nan::FunctionCallbackInfo<v8::Value>& args);
+  void updateTelemetry(const Nan::FunctionCallbackInfo<v8::Value> &args);
 
-  void getTelemetry(const Nan::FunctionCallbackInfo<v8::Value>& args);
+  void getTelemetry(const Nan::FunctionCallbackInfo<v8::Value> &args);
 
-  void getTelemetryDescription(const Nan::FunctionCallbackInfo<v8::Value>& args);
-  
+  void getTelemetryDescription(const Nan::FunctionCallbackInfo<v8::Value> &args);
+
   NAN_METHOD(sendCmd);
 
-  static void cleanUp(void* arg);
+  static void cleanUp(void *arg);
 
   // this defines public api of native addon
   NAN_MODULE_INIT(init)
@@ -51,15 +51,15 @@ namespace NodeIrSdk {
     NAN_EXPORT(target, updateTelemetry);
     NAN_EXPORT(target, getTelemetryDescription);
     NAN_EXPORT(target, getTelemetry);
-    
+
     NAN_EXPORT(target, sendCmd);
   }
 
-  // name of native addon (fixed for electron)
-  // https://github.com/electron/electron/issues/18397
-  #if NODE_MAJOR_VERSION >= 10
+// name of native addon (fixed for electron)
+// https://github.com/electron/electron/issues/18397
+#if NODE_MAJOR_VERSION >= 10
   NAN_MODULE_WORKER_ENABLED(IrSdkNodeBindings, init)
-  #else
+#else
   NODE_MODULE(IrSdkNodeBindings, init)
-  #endif
+#endif
 }

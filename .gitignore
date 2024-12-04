@@ -18,3 +18,7 @@ npm-debug.log
 
 # Logged telem data
 test/*.json
+build-tmp-napi-*
+build-tmp-napi-*
+
+lib

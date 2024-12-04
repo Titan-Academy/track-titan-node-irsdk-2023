@@ -21,3 +21,5 @@ src/doc
 appveyor.yml
 npm-debug.log
 .vscode
+build-tmp-napi-v8
+build-tmp-napi-v9
