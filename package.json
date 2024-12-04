@@ -1,6 +1,6 @@
 {
   "name": "@titan-academy/track-titan-node-irsdk-2023",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "iRacing SDK implementation for nodejs",
   "main": "src/node-irsdk.js",
   "binary": {
@@ -17,7 +17,7 @@
     "prebuild": "node-pre-gyp configure build",
     "rebuild": "node-pre-gyp rebuild --verbose",
     "postrebuild": "node createBindingLocation.js",
-    "publish": "node-pre-gyp package publish",
+    "publishToS3": "node-pre-gyp package publish",
     "postpackage": "node createBindingLocation.js",
     "package": "node-pre-gyp package",
     "testbinary": "node-pre-gyp testpackage runtime=node"
