@@ -74,6 +74,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          git checkout main
           git fetch
           git pull
           git config --global user.name 'github-actions[bot]'
