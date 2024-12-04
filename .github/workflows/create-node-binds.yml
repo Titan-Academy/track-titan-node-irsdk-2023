@@ -1,9 +1,8 @@
 name: Build and Publish Precompiled Binaries
 
 on:
-  push:
-    tags:
-      - 'v*'
+  workflow_call:
+  workflow_dispatch:
 
 jobs:
   build-and-publish:
