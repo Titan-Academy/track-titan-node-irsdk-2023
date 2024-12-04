@@ -5,10 +5,7 @@ on:
     types: [created]
 
 jobs:
-  create-node-binds:
-    uses: ./.github/workflows/create-node-binds.yml
   build:
-    needs: create-node-binds
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
