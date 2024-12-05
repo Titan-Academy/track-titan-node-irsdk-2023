@@ -18,7 +18,7 @@ function copyBindings() {
     files.forEach(file => {
       const srcFile = path.join(srcDir, file);
       const destFileName = `${nodeMajorVersion}-${platform}-${arch}-${bindingName}`;
-      const destFile = path.join(__dirname, 'binding', destFileName);
+      const destFile = path.join(__dirname, 'src', 'binding', destFileName);
 
       fs.copyFile(srcFile, destFile, err => {
         if (err) {

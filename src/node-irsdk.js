@@ -20,7 +20,7 @@ if (isElectron()) {
   bindingPath = path.resolve(
     path.join(
       __dirname,
-      "../binding",
+      "./binding",
       `${majorVersion}-${platform}-${arch}-${bindingName}`
     )
   );
