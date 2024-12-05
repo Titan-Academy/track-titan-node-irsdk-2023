@@ -13,6 +13,7 @@ const isElectron = () => {
   return false;
 };
 
+var bindingPath;
 const bindingName = `IrSdkNodeBindings.node`;
 if (isElectron()) {
   bindingPath = path.resolve(path.join(__dirname, "../lib/binding", bindingName));
