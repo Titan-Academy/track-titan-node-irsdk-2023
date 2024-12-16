@@ -41,7 +41,6 @@ if (isElectron()) {
       err.message
     );
     throw err;
-  }
 }
 
 var JsIrSdk = require("./JsIrSdk");
