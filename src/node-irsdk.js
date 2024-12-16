@@ -6,7 +6,11 @@ const arch = process.arch;
 
 const isElectron = () => {
   // Main process
-  if (typeof process !== 'undefined' && typeof process.versions === 'object' && !!process.versions.electron) {
+  if (
+    typeof process !== "undefined" &&
+    typeof process.versions === "object" &&
+    !!process.versions.electron
+  ) {
     return true;
   }
 
@@ -16,7 +20,7 @@ const isElectron = () => {
 var bindingPath;
 const bindingName = `IrSdkNodeBindings.node`;
 if (isElectron()) {
-  bindingPath = path.resolve(path.join(__dirname, "../lib/binding", bindingName));
+  bindingPath = path.resolve(path.join(__dirname, "../main", bindingName));
 } else {
   bindingPath = path.resolve(
     path.join(
