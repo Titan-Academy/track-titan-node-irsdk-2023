@@ -17,30 +17,30 @@ const isElectron = () => {
   return false;
 };
 
-var IrSdkNodeWrapper;
-
+var bindingPath;
+const bindingName = `IrSdkNodeBindings.node`;
 if (isElectron()) {
-  IrSdkNodeWrapper = require("../build/Release/IrSdkNodeBindings.node");
+  bindingPath = path.resolve(path.join(__dirname, "../main", bindingName));
 } else {
-  try {
-    const bindingName = `IrSdkNodeBindings.node`;
+  bindingPath = path.resolve(
+    path.join(
+      __dirname,
+      "./binding",
+      `${majorVersion}-${platform}-${arch}-${bindingName}`
+    )
+  );
+}
 
-    const bindingPath = path.resolve(
-      path.join(
-        __dirname,
-        "./binding",
-        `${majorVersion}-${platform}-${arch}-${bindingName}`
-      )
-    );
-
-    IrSdkNodeWrapper = require(bindingPath);
-  } catch (err) {
-    console.error(
-      "Failed to load iRacing SDK bindings.",
-      `${majorVersion}-${platform}-${arch} not supported.`,
-      err.message
-    );
-    throw err;
+var IrSdkNodeWrapper;
+try {
+  IrSdkNodeWrapper = require(bindingPath);
+} catch (err) {
+  console.error(
+    "Failed to load iRacing SDK bindings.",
+    `${majorVersion}-${platform}-${arch} not supported.`,
+    err.message
+  );
+  throw err;
 }
 
 var JsIrSdk = require("./JsIrSdk");
