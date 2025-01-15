@@ -19,10 +19,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Node.js ${{ matrix.node-version }}
+      - name: Set up Node.js ${{ matrix.node-version }} ${{ matrix.architecture }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+          architecture: ${{ matrix.architecture }}
           cache: npm
 
       - name: Install Python
