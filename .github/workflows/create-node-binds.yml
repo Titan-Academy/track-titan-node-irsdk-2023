@@ -51,9 +51,15 @@ jobs:
       - name: Install nan@latest for newer Node.js versions
         if: ${{ matrix.node-version > 20 }}
         run: npm install nan@latest
+        env:
+          npm_config_arch: ${{ matrix.architecture }}
+          npm_config_platform: ${{ matrix.platform }}
 
       - name: Install dependencies
         run: npm run installFromSource
+        env:
+          npm_config_arch: ${{ matrix.architecture }}
+          npm_config_platform: ${{ matrix.platform }}
 
       - name: Build binary for ${{ matrix.platform }} ${{ matrix.architecture }}
         run: npm run prebuild
