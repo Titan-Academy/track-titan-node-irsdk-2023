@@ -44,6 +44,9 @@ jobs:
           key: ${{ runner.os }}-node-gyp-${{ matrix.node-version }}-${{ matrix.architecture }}
           restore-keys: |
             ${{ runner.os }}-node-gyp-${{ matrix.node-version }}-
+        env:
+          npm_config_arch: ${{ matrix.architecture }}
+          npm_config_platform: ${{ matrix.platform }}
 
       - name: Install nan@latest for newer Node.js versions
         if: ${{ matrix.node-version > 20 }}
