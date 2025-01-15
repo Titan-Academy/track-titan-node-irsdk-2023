@@ -10,9 +10,9 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        node-version: [16, 18, 19, 20, 21, 22, 23]
+        node-version: [20]
         platform: [win32]
-        architecture: [x64]
+        architecture: [x64, x86]
       max-parallel: 1
 
     steps:
