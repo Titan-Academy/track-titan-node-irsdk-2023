@@ -76,10 +76,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          git stash
           git fetch
           git pull
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git stash pop
           git add ./src/binding
           git commit -m "Add built binaries for ${{ matrix.platform }} ${{ matrix.architecture }} with Node.js ${{ matrix.node-version }}"
           git push
