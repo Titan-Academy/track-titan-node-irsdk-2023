@@ -71,6 +71,8 @@ jobs:
           
       - name: Create binding location file
         run: node createBindingLocation.js
+        env:
+          ARCH: ${{ matrix.architecture }}
 
       - name: Commit binary to the repository
         env:

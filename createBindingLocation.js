@@ -6,7 +6,7 @@ function copyBindings() {
   const srcDir = path.join(__dirname, 'lib', 'binding');
   const nodeMajorVersion = process.versions.node.split('.')[0];
   const platform = os.platform();
-  const arch = os.arch();
+  const arch = process.env.ARCH ?? os.arch();
   const bindingName = `IrSdkNodeBindings.node`;
 
   fs.readdir(srcDir, (err, files) => {
