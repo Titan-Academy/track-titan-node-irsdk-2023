@@ -7,30 +7,29 @@ on:
 
 jobs:
   build-and-publish:
+    runs-on:  'windows-latest'
     strategy:
       matrix:
         node-version: [20]
         platform: [win32]
         architecture: [x64, x86]
       max-parallel: 1
-    runs-on: ${{ matrix.architecture == 'x64' && 'windows-latest' || 'windows-2019' }}
+
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Node.js ${{ matrix.node-version }} ${{ matrix.architecture }}
+      - name: Set up Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-          architecture: ${{ matrix.architecture }}
           cache: npm
 
       - name: Install Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
-          architecture: ${{ matrix.architecture }}
 
       - name: Install distutils
         run: |
@@ -44,37 +43,28 @@ jobs:
           key: ${{ runner.os }}-node-gyp-${{ matrix.node-version }}-${{ matrix.architecture }}
           restore-keys: |
             ${{ runner.os }}-node-gyp-${{ matrix.node-version }}-
-        env:
-          npm_config_arch: ${{ matrix.architecture }}
-          npm_config_platform: ${{ matrix.platform }}
 
       - name: Install nan@latest for newer Node.js versions
         if: ${{ matrix.node-version > 20 }}
         run: npm install nan@latest
-        env:
-          npm_config_arch: ${{ matrix.architecture }}
-          npm_config_platform: ${{ matrix.platform }}
 
       - name: Install dependencies
         run: npm run installFromSource
-        env:
-          npm_config_arch: ${{ matrix.architecture }}
-          npm_config_platform: ${{ matrix.platform }}
 
       - name: Build binary for ${{ matrix.platform }} ${{ matrix.architecture }}
-        run: npm run prebuild
+        run: npm run prebuild ${{ matrix.architecture == 'x86' && '-- --target_arch=ia32' || '' }}
         env:
           npm_config_arch: ${{ matrix.architecture }}
           npm_config_platform: ${{ matrix.platform }}
 
       - name: Package binary for ${{ matrix.platform }} ${{ matrix.architecture }}
-        run: npm run package
+        run: npm run package ${{ matrix.architecture == 'x86' && '-- --target_arch=ia32' || '' }}
         env:
           npm_config_arch: ${{ matrix.architecture }}
           npm_config_platform: ${{ matrix.platform }}
 
       - name: Test the binary
-        run: npm run testbinary
+        run: npm run testbinary ${{ matrix.architecture == 'x86' && '-- --target_arch=ia32' || '' }}
         env:
           npm_config_arch: ${{ matrix.architecture }}
           npm_config_platform: ${{ matrix.platform }}
