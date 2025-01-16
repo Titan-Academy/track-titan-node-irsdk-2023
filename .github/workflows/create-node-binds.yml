@@ -7,13 +7,13 @@ on:
 
 jobs:
   build-and-publish:
-    runs-on: windows-latest
     strategy:
       matrix:
         node-version: [20]
         platform: [win32]
         architecture: [x64, x86]
       max-parallel: 1
+    runs-on: ${{ matrix.architecture == 'x64' && 'windows-latest' || 'windows-2019' }}
 
     steps:
       - name: Checkout code
