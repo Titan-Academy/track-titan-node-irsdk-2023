@@ -140,4 +140,10 @@ namespace NodeIrSdk
   {
     irsdk.shutdown();
   }
+
+  void getMemoryBuffer(const Nan::FunctionCallbackInfo<v8::Value> &args)
+  {
+    const char* buffer = irsdk.getMemoryBuffer();
+    args.GetReturnValue().Set(Nan::New(buffer).ToLocalChecked());
+  }
 } // namespace NodeIrSdk

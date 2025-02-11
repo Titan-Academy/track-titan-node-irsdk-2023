@@ -233,3 +233,9 @@ bool NodeIrSdk::IRSDKWrapper::getVarVal(TelemetryVar& var) const
   memcpy(var.value, data + var.header->offset, valueBytes);
   return true;
 }
+
+const char* NodeIrSdk::IRSDKWrapper::getMemoryBuffer() const 
+{
+  debug("IRSDKWrapper: getMemoryBuffer");
+  return pSharedMem;
+}

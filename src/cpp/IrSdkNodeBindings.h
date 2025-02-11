@@ -28,6 +28,8 @@ namespace NodeIrSdk
 
   void getTelemetryDescription(const Nan::FunctionCallbackInfo<v8::Value> &args);
 
+  void getMemoryBuffer(const Nan::FunctionCallbackInfo<v8::Value> &args);
+
   NAN_METHOD(sendCmd);
 
   static void cleanUp(void *arg);
@@ -53,6 +55,8 @@ namespace NodeIrSdk
     NAN_EXPORT(target, getTelemetry);
 
     NAN_EXPORT(target, sendCmd);
+
+    NAN_EXPORT(target, getMemoryBuffer);
   }
 
 // name of native addon (fixed for electron)

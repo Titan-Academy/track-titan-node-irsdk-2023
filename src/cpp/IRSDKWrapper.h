@@ -29,6 +29,8 @@ namespace NodeIrSdk
 
     const std::string getSessionInfo() const; // returns yaml string
 
+    const char* getMemoryBuffer() const;
+
     struct TelemetryVar
     {
       irsdk_varHeader *header;

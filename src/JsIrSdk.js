@@ -319,6 +319,14 @@ function JsIrSdk(IrSdkWrapper, opts) {
     }
   };
 
+  /** Get memory buffer
+    @method
+    @returns {Buffer} memory buffer
+  */
+  this.getMemoryBuffer = function () {
+    return IrSdkWrapper.getMemoryBuffer();
+  };
+
   var self = this;
   opts = opts || {};
 
