@@ -18,13 +18,17 @@ const bindingName = `IrSdkNodeBindings.node`;
 if (isElectron()) {
   bindingPath = path.resolve(path.join(__dirname, "../lib/binding", bindingName));
 } else {
-  bindingPath = path.resolve(
-    path.join(
-      __dirname,
-      "./binding",
-      `${majorVersion}-${platform}-${arch}-${bindingName}`
-    )
-  );
+  if (process.env.CONSUMER && process.env.APPDATA && process.env.SDK_PATH) {
+    bindingPath = path.join(process.env.APPDATA, process.env.SDK_PATH, process.env.CONSUMER, 'binding', `${majorVersion}-${platform}-${arch}-${bindingName}`);
+  } else {
+    bindingPath = path.resolve(
+      path.join(
+        Buffer.from(__dirname).toString('utf8'),
+        "./binding",
+        `${majorVersion}-${platform}-${arch}-${bindingName}`
+      )
+    );
+  }
 }
 
 var IrSdkNodeWrapper;
