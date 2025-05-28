@@ -1,4 +1,6 @@
 # node-irsdk-2023
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FTitan-Academy%2Ftrack-titan-node-irsdk-2023.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FTitan-Academy%2Ftrack-titan-node-irsdk-2023?ref=badge_shield)
+
 
 Unofficial [iRacing](http://www.iracing.com/) SDK implementation for NodeJS.
 
@@ -53,3 +55,7 @@ Other iRSDK implementations
 * [iRacingSdkWrapper (C#)](https://github.com/NickThissen/iRacingSdkWrapper)
 * [pyirsdk (python3)](https://github.com/kutu/pyirsdk/)
 * [iRacingSDK.Net](https://github.com/vipoo/iRacingSDK.Net)
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FTitan-Academy%2Ftrack-titan-node-irsdk-2023.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FTitan-Academy%2Ftrack-titan-node-irsdk-2023?ref=badge_large)
