@@ -22,3 +22,4 @@ build-tmp-napi-*
 build-tmp-napi-*
 
 lib
+.aider*

@@ -13,7 +13,13 @@ function createSessionInfoParser() {
   var yaml = require("js-yaml");
 
   return function (sessionInfoStr) {
-    var fixedYamlStr = sessionInfoStr.replace(
+    // Handle empty/whitespace with comma (i.e Abbrevname: , )
+    const cleanedSessionInfoStr = sessionInfoStr.replace(
+      /^(\s*\w+:\s*)(?:,\s*)+$/gm,
+      "$1''"
+    );
+
+    var fixedYamlStr = cleanedSessionInfoStr.replace(
       /TeamName: ([^\n]+)/g,
       function (match, p1) {
         if (
