@@ -9,17 +9,23 @@ var BroadcastMsg = Consts.BroadcastMsg;
   @param {string} sessionInfoStr raw session info YAML string
   @returns {Object} parsed session info or falsy
 */
-function createSessionInfoParser() {
+export function createSessionInfoParser() {
   var yaml = require("js-yaml");
 
   return function (sessionInfoStr) {
     // Handle empty/whitespace with comma (i.e Abbrevname: , )
     const cleanedSessionInfoStr = sessionInfoStr.replace(
-      /^(\s*\w+:\s*)(?:,\s*)+$/gm,
-      "$1''"
+      /^(\s*\w+:\s*),\s*(.*)$/gm,
+      "$1'$2'"
     );
 
-    var fixedYamlStr = cleanedSessionInfoStr.replace(
+    // Handle orphaned negative sign (i.e UserName: - -11)
+    const noOrphanedNegative = cleanedSessionInfoStr.replace(
+      /^(\s*\w+:\s*)-\s*(-?\d+)$/gm,
+      "$1$2"
+    );
+
+    var fixedYamlStr = noOrphanedNegative.replace(
       /TeamName: ([^\n]+)/g,
       function (match, p1) {
         if (
