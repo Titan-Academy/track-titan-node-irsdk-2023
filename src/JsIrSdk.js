@@ -9,7 +9,7 @@ var BroadcastMsg = Consts.BroadcastMsg;
   @param {string} sessionInfoStr raw session info YAML string
   @returns {Object} parsed session info or falsy
 */
-export function createSessionInfoParser() {
+function createSessionInfoParser() {
   var yaml = require("js-yaml");
 
   return function (sessionInfoStr) {
