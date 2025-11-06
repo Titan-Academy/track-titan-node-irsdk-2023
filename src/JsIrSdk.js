@@ -44,7 +44,14 @@ function createSessionInfoParser() {
       /[\x00-\x08\x0B\x0C\x0E-\x1F\x7F\x80-\x9F]/g,
       ""
     );
-    return yaml.load(sanitizedSessionInfo);
+
+    // Remove entire Drivetrain section to avoid duplicate 'At' key issues
+    const noDrivetrainSessionInfo = sanitizedSessionInfo.replace(
+      /^ Drivetrain:[\s\S]*?(?=^\S|\n$)/m,
+      ""
+    );
+    
+    return yaml.load(noDrivetrainSessionInfo);
   };
 }
 
