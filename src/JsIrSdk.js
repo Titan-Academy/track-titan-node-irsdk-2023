@@ -45,12 +45,12 @@ function createSessionInfoParser() {
       ""
     );
 
-    // Remove entire Drivetrain section to avoid duplicate 'At' key issues
+    // Remove Drivetrain subsection within CarSetup to avoid duplicate 'At' key issues
     const noDrivetrainSessionInfo = sanitizedSessionInfo.replace(
-      /^ Drivetrain:[\s\S]*?(?=^\S|\n$)/m,
+      /^( Drivetrain:\r?\n(?:  .*\r?\n)*)/m,
       ""
     );
-    
+
     return yaml.load(noDrivetrainSessionInfo);
   };
 }
