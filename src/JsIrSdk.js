@@ -365,10 +365,9 @@ function JsIrSdk(IrSdkWrapper, opts) {
       // replace ctime timestamp
       self.telemetry.timestamp = now;
 
-      setImmediate(function () {
-        if (!self.telemetryDescription) {
-          self.telemetryDescription = IrSdkWrapper.getTelemetryDescription();
-          /**
+      if (!self.telemetryDescription) {
+        self.telemetryDescription = IrSdkWrapper.getTelemetryDescription();
+        /**
             Telemetry description, contains description of available telemetry values
             @event iracing#TelemetryDescription
             @type Object
@@ -377,13 +376,13 @@ function JsIrSdk(IrSdkWrapper, opts) {
             *   console.log(evt)
             * })
           */
-          self.emit("update", {
-            type: "TelemetryDescription",
-            data: self.telemetryDescription,
-            timestamp: now,
-          });
-        }
-        /**
+        self.emit("update", {
+          type: "TelemetryDescription",
+          data: self.telemetryDescription,
+          timestamp: now,
+        });
+      }
+      /**
           Telemetry update
           @event iracing#Telemetry
           @type Object
@@ -392,11 +391,10 @@ function JsIrSdk(IrSdkWrapper, opts) {
           *   console.log(evt)
           * })
         */
-        self.emit("update", {
-          type: "Telemetry",
-          data: self.telemetry.values,
-          timestamp: now,
-        });
+      self.emit("update", {
+        type: "Telemetry",
+        data: self.telemetry.values,
+        timestamp: now,
       });
     }
   }, opts.telemetryUpdateInterval);
@@ -407,17 +405,16 @@ function JsIrSdk(IrSdkWrapper, opts) {
       var now = new Date();
       var sessionInfo = IrSdkWrapper.getSessionInfo();
       var doc;
-      setImmediate(function () {
-        try {
-          doc = parseSessionInfo(sessionInfo);
-        } catch (ex) {
-          // TODO: log faulty yaml
-          console.error("js-irsdk: yaml error: \n" + ex);
-        }
+      try {
+        doc = parseSessionInfo(sessionInfo);
+      } catch (ex) {
+        // TODO: log faulty yaml
+        console.error("js-irsdk: yaml error: \n" + ex);
+      }
 
-        if (doc) {
-          self.sessionInfo = { timestamp: now, data: doc };
-          /**
+      if (doc) {
+        self.sessionInfo = { timestamp: now, data: doc };
+        /**
             SessionInfo update
             @event iracing#SessionInfo
             @type Object
@@ -426,13 +423,12 @@ function JsIrSdk(IrSdkWrapper, opts) {
             *   console.log(evt)
             * })
           */
-          self.emit("update", {
-            type: "SessionInfo",
-            data: self.sessionInfo.data,
-            timestamp: now,
-          });
-        }
-      });
+        self.emit("update", {
+          type: "SessionInfo",
+          data: self.sessionInfo.data,
+          timestamp: now,
+        });
+      }
     }
   }, opts.sessionInfoUpdateInterval);
 
