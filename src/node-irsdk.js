@@ -94,3 +94,18 @@ var init = (module.exports.init = function (opts) {
 module.exports.getInstance = function () {
   return init();
 };
+
+/**
+  Stop and cleanup JsIrSdk instance
+  @function
+  @static
+  @example
+  * var irsdk = require('node-irsdk-2023')
+  * irsdk.stop()
+*/
+module.exports.stop = function () {
+  if (instance) {
+    instance._stop();
+    instance = null;
+  }
+};
